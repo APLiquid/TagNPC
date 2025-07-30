@@ -76,6 +76,6 @@ You can also manage NPCs directly through the chat:
 
 ## 📜 License
 
-MIT License
+GPL-3.0 license
 
 ---
