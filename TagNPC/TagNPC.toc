@@ -1,0 +1,7 @@
+## Interface: 30300
+## Title: TagNPC
+## Notes: Adds icons to specific mobs
+TagNPC.lua
+
+## SavedVariables: TagNPCDB
+
