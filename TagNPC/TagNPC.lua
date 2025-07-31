@@ -26,7 +26,7 @@ f:SetScript("OnEvent", function(self, event, addonName)
         -- Start scanner
         self:SetScript("OnUpdate", function(self, elapsed)
             self.timer = (self.timer or 0) + elapsed
-            if self.timer > 0.2 then
+            if self.timer > 0.5 then
                 self.timer = 0
                 ScanNameplates()
             end
@@ -35,8 +35,9 @@ f:SetScript("OnEvent", function(self, event, addonName)
 end)
 
 -- Nameplate handling
-local function AddIcon(plate, iconID)
+function AddIcon(plate, iconID)
     if nameplateIcons[plate] then return end
+
     local icon = plate:CreateTexture(nil, "OVERLAY")
     icon:SetTexture(ICON_PATH .. iconID)
     icon:SetSize(20, 20)
@@ -45,22 +46,42 @@ local function AddIcon(plate, iconID)
 end
 
 function ScanNameplates()
+    -- Clear old icons first
+    for plate, icon in pairs(nameplateIcons) do
+        if icon then
+            icon:Hide()
+        end
+    end
+    wipe(nameplateIcons)
+
+    -- Now do a fresh scan
     for i = 1, WorldFrame:GetNumChildren() do
         local plate = select(i, WorldFrame:GetChildren())
+
         if plate:IsShown() and not plate:GetName() then
             local regions = {plate:GetRegions()}
+            local foundName = nil
+
             for _, region in ipairs(regions) do
                 if region and region:GetObjectType() == "FontString" and region:GetText() then
-                    local mobName = region:GetText()
-					local npcIconID = mobNamesToTrack[mobName]
-					if npcIconID then
-						AddIcon(plate, npcIconID)
-					end
+                    local text = region:GetText()
+
+                    if not tonumber(text) and mobNamesToTrack[text] then
+                        foundName = text
+                        break
+                    end
                 end
+            end
+
+            if foundName then
+                AddIcon(plate, mobNamesToTrack[foundName])
             end
         end
     end
 end
+
+
+
 
 -- UI Panel
 local panel = CreateFrame("Frame")
